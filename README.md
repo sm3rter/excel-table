@@ -1,6 +1,6 @@
 # Excel Table
 
-Open, edit and convert spreadsheets in your browser. **xlsx, csv, tsv and json in; xlsx, csv and json out.**
+Open, edit and convert spreadsheets in your browser. **xlsx, xls, csv, tsv and json in; xlsx, xls, csv and json out.**
 No server, no build step, no dependencies, and nothing is uploaded: your file never leaves your device.
 
 <p>
@@ -11,10 +11,10 @@ No server, no build step, no dependencies, and nothing is uploaded: your file ne
 
 ## What it does
 
-- **Open** `.xlsx`, `.csv`, `.tsv` and `.json` files (choose a file, or drop it anywhere on the page). Multi-sheet workbooks get tabs.
+- **Open** `.xlsx`, `.xls`, `.csv`, `.tsv` and `.json` files (choose a file, or drop it anywhere on the page). Multi-sheet workbooks get tabs.
 - **Edit** like a spreadsheet: tap a cell, change it in the formula bar at the top, press Enter. Add, insert and delete rows and columns (deletes can be undone).
 - **Search** all rows and **sort** by any column (tap the column letter).
-- **Export** the whole workbook to `.xlsx`, or the current sheet to `.csv` or `.json`.
+- **Export** the whole workbook to `.xlsx` or the older `.xls`, or the current sheet to `.csv` or `.json`.
 - **Mobile first.** Big touch targets, a bottom sheet for menus and sticky headers.
 - **English and Arabic**, with a right-to-left layout. Arabic CSV files saved by Excel (windows-1256) open correctly, and an exported `.xlsx` is set to right-to-left automatically when its content is Arabic.
 - **Light and dark** theme, following the device setting.
@@ -48,6 +48,7 @@ index.html        the page
 css/style.css     mobile-first styles (light and dark)
 js/zip.js         zip reader and writer (uses the browser's built-in deflate)
 js/xlsx.js        .xlsx reader and writer
+js/xls.js         .xls (Excel 97-2003) reader and writer
 js/tabular.js     csv and json import and export
 js/values.js      cell values: formatting, parsing, sorting
 js/i18n.js        English and Arabic strings
@@ -69,7 +70,7 @@ and check that files written by this project round-trip. `tests/fixtures/make_fi
 
 ## Limits
 
-- **Old `.xls` files are not supported.** Open them in Excel and save as `.xlsx`.
+- `.xls` means Excel 97-2003 (BIFF8). Password-protected and very old (Excel 5) files are rejected with a message. The `.xls` writer is tested against LibreOffice and this project's own reader, not against Microsoft Excel. A sheet over 65,536 rows or 256 columns cannot be exported as `.xls` (use `.xlsx`).
 - Formatting (colors, fonts, merged cells), charts, images and macros are not kept. Formulas are read as their last calculated value, and they are exported as values.
 - Numbers show as stored, so a cell formatted as `25%` shows `0.25`. Dates and times show as `2024-03-05` or `2024-03-05 13:45`.
 - Text that looks like a number is turned into a number when you type it or open a CSV, except values with leading zeros or more than 15 digits (`00123`, phone numbers), which stay text.
@@ -78,7 +79,7 @@ and check that files written by this project round-trip. `tests/fixtures/make_fi
 
 ## بالعربي
 
-افتح ملف إكسل أو CSV أو JSON، وعدّل الخلايا، ثم صدّره بصيغة xlsx أو csv أو json. كل شيء يعمل داخل المتصفح ولا يُرفع أي ملف.
+افتح ملف إكسل أو CSV أو JSON، وعدّل الخلايا، ثم صدّره بصيغة xlsx أو xls أو csv أو json. كل شيء يعمل داخل المتصفح ولا يُرفع أي ملف.
 لتشغيله: افتح `index.html`. وللنشر على GitHub Pages اتبع خطوات «Publish on GitHub Pages» أعلاه.
 
 ## License

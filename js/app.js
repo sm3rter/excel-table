@@ -124,7 +124,6 @@
   function renderBar() {
     const open = state.sheets.length > 0;
     els.openBtn.hidden = !open;
-    els.langBtn.textContent = I18n.lang === 'ar' ? 'EN' : 'ع';
     els.title.textContent = open ? state.fileName : t('app.title');
     document.title = open ? state.fileName + ' – ' + t('app.title') : t('app.title');
     els.welcome.hidden = open;
@@ -499,8 +498,10 @@
       const isOle = bytes[0] === 0xD0 && bytes[1] === 0xCF && bytes[2] === 0x11 && bytes[3] === 0xE0;
 
       let sheets;
-      if (isOle) throw friendly(t('err.xls'));
-      if (isZip || ext === 'xlsx' || ext === 'xlsm') {
+      if (isOle || (ext === 'xls' && !isZip)) {
+        if (!XlsLite.isXls(bytes)) throw friendly(t('err.xlsBad'));
+        sheets = XlsLite.read(bytes).sheets;
+      } else if (isZip || ext === 'xlsx' || ext === 'xlsm') {
         sheets = (await XlsxLite.read(bytes)).sheets;
       } else if (['csv', 'tsv', 'txt', 'json'].includes(ext)) {
         const text = Tabular.decodeText(bytes);
@@ -540,6 +541,11 @@
         download(new Blob([bytes], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), base + '.xlsx');
         return;
       }
+      if (kind === 'xls') {
+        const bytes = XlsLite.write(state.sheets.map((s) => ({ name: s.name, rows: s.rows })), { header: state.headerRow });
+        download(new Blob([bytes], { type: 'application/vnd.ms-excel' }), base + '.xls');
+        return;
+      }
       const suffix = state.sheets.length > 1 ? '-' + baseName(sheet.name) : '';
       if (kind === 'csv') {
         download(new Blob(['﻿' + Tabular.toCsv(sheet.rows)], { type: 'text/csv;charset=utf-8' }), base + suffix + '.csv');
@@ -556,6 +562,7 @@
     const n = state.sheets.length;
     openMenu(t('export.title'), [
       { label: t('export.xlsx'), hint: n > 1 ? t('export.xlsx.hint', { n }) : t('export.xlsx.hint1'), run: () => exportAs('xlsx') },
+      { label: t('export.xls'), hint: t('export.xls.hint'), run: () => exportAs('xls') },
       { label: t('export.csv'), hint: t('export.csv.hint'), run: () => exportAs('csv') },
       { label: t('export.json'), hint: state.headerRow ? t('export.json.hintHeader') : t('export.json.hintPlain'), run: () => exportAs('json') },
     ]);
@@ -622,7 +629,10 @@
   els.sheet.addEventListener('click', (e) => { if (e.target === els.sheet) els.sheet.close(); });
 
   els.langBtn.addEventListener('click', () => {
-    setLanguage(I18n.lang === 'ar' ? 'en' : 'ar');
+    openMenu(t('lang.title'), [
+      { label: 'English', hint: I18n.lang === 'en' ? '✓' : '', run: () => setLanguage('en') },
+      { label: 'العربية', hint: I18n.lang === 'ar' ? '✓' : '', run: () => setLanguage('ar') },
+    ]);
   });
 
   // drag and drop a file anywhere on the page

@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" content="#f3f6f1" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#0e1511" media="(prefers-color-scheme: dark)">
-  <meta name="description" content="Open, edit and convert xlsx, csv and json files in your browser. Nothing is uploaded.">
+  <meta name="description" content="Open, edit and convert xlsx, xls, csv and json files in your browser. Nothing is uploaded.">
   <title>Excel Table</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231e6b4b'/%3E%3Cpath d='M8 8h16v16H8zM8 13.3h16M8 18.7h16M13.3 8v16M18.7 8v16' fill='none' stroke='%23fff' stroke-width='1.6' opacity='.55'/%3E%3Crect x='13.3' y='13.3' width='5.4' height='5.4' fill='%23fff'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="css/style.css">
@@ -20,7 +20,7 @@
     </svg>
     <h1 id="title" class="title" data-i18n="app.title">Excel Table</h1>
     <button id="open-btn" class="btn quiet" type="button" data-i18n="bar.open" hidden>Open file</button>
-    <button id="lang-btn" class="btn quiet lang" type="button" data-i18n-label="bar.language" aria-label="Language">ع</button>
+    <button id="lang-btn" class="btn quiet lang" type="button" data-i18n-label="bar.language" aria-label="Language" aria-haspopup="dialog"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.6 2.4 4 5.5 4 9s-1.4 6.6-4 9c-2.6-2.4-4-5.5-4-9s1.4-6.6 4-9z"/></svg></button>
   </header>
 
   <main>
@@ -33,12 +33,12 @@
           <span class="drop-action" data-i18n="welcome.choose">Choose a file</span>
         </span>
       </button>
-      <p class="lead" data-i18n="welcome.lead">View, edit and convert xlsx, csv and json files. Nothing is uploaded: your file stays on this device.</p>
+      <p class="lead" data-i18n="welcome.lead">View, edit and convert xlsx, xls, csv and json files. Nothing is uploaded: your file stays on this device.</p>
       <div class="welcome-actions">
         <button id="sample-btn" class="btn" type="button" data-i18n="welcome.sample">Try the sample</button>
       </div>
       <p class="fine hint-drop" data-i18n="welcome.drop">You can also drop a file anywhere on this page.</p>
-      <p class="fine" data-i18n="welcome.formats">Supported: xlsx, csv, tsv and json. For an old .xls file, open it in Excel and save it as .xlsx first.</p>
+      <p class="fine" data-i18n="welcome.formats">Supported: xlsx, xls, csv, tsv and json.</p>
     </section>
 
     <section id="workspace" class="workspace" hidden>
@@ -91,11 +91,12 @@
   <div id="busy" class="busy" role="status" hidden><span data-i18n="busy">Opening…</span></div>
 
   <input id="file-input" type="file" hidden
-         accept=".xlsx,.xlsm,.csv,.tsv,.txt,.json,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,application/json">
+         accept=".xlsx,.xlsm,.xls,.csv,.tsv,.txt,.json,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv,application/json">
 
   <script src="js/zip.js"></script>
   <script src="js/values.js"></script>
   <script src="js/xlsx.js"></script>
+  <script src="js/xls.js"></script>
   <script src="js/tabular.js"></script>
   <script src="js/i18n.js"></script>
   <script src="data/sample.js"></script>

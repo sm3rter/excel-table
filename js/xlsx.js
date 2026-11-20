@@ -14,9 +14,6 @@
 })(typeof self !== 'undefined' ? self : this, function (Zip, Values) {
   'use strict';
 
-  const BUILTIN_DATE_FORMATS = new Set([14, 15, 16, 17, 18, 19, 20, 21, 22, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36,
-    45, 46, 47, 50, 51, 52, 53, 54, 55, 56, 57, 58]);
-
   // ------------------------------------------------------------ xml helpers
 
   function decodeEntities(s) {
@@ -86,14 +83,6 @@
 
   // ------------------------------------------------------------------- read
 
-  function isDateFormat(id, customCodes) {
-    if (BUILTIN_DATE_FORMATS.has(id)) return true;
-    const code = customCodes[id];
-    if (!code) return false;
-    const cleaned = code.replace(/"[^"]*"/g, '').replace(/\\./g, '').replace(/\[[^\]]*\]/g, '').replace(/_./g, '');
-    return /[ymdhs]/i.test(cleaned);
-  }
-
   function parseStyles(xml) {
     const dateXf = [];
     if (!xml) return dateXf;
@@ -109,7 +98,7 @@
     if (xfs) {
       const xfRe = /<xf\b([^>]*?)\/?>/g;
       while ((m = xfRe.exec(xfs[1]))) {
-        dateXf.push(isDateFormat(parseInt(attrs(m[1]).numFmtId || '0', 10), codes));
+        dateXf.push(Values.isDateFormat(parseInt(attrs(m[1]).numFmtId || '0', 10), codes));
       }
     }
     return dateXf;
@@ -123,12 +112,6 @@
     let m;
     while ((m = re.exec(xml))) out.push(m[1] ? textOf(m[1]) : '');
     return out;
-  }
-
-  function serialToDate(serial, date1904) {
-    const days = date1904 ? serial + 1462 : serial;
-    const ms = Math.round(((days - 25569) * 86400000) / 1000) * 1000;
-    return new Date(ms);
   }
 
   function readCell(a, inner, ctx) {
@@ -158,7 +141,7 @@
         if (v === '') return null;
         const n = Number(v);
         if (!isFinite(n)) return decodeText(v);
-        return ctx.dateXf[parseInt(a.s || '0', 10)] ? serialToDate(n, ctx.date1904) : n;
+        return ctx.dateXf[parseInt(a.s || '0', 10)] ? Values.serialToDate(n, ctx.date1904) : n;
       }
     }
   }
@@ -261,18 +244,6 @@
     + '<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>'
     + '</styleSheet>';
 
-  function sheetName(raw, used) {
-    let base = String(raw || 'Sheet').replace(/[\[\]:*?\/\\]/g, ' ').replace(/^'+|'+$/g, '').trim().slice(0, 31) || 'Sheet';
-    let name = base;
-    let n = 2;
-    while (used.has(name.toLowerCase())) {
-      const suffix = ' (' + n++ + ')';
-      name = base.slice(0, 31 - suffix.length) + suffix;
-    }
-    used.add(name.toLowerCase());
-    return name;
-  }
-
   function sheetXml(rows, opt) {
     const columns = rows.reduce((max, r) => Math.max(max, r.length), 0);
     const header = opt.header !== false;
@@ -326,7 +297,7 @@
     opt = opt || {};
     if (!sheets.length) throw new Error('Nothing to export: the workbook has no sheets.');
     const used = new Set();
-    const named = sheets.map((s) => ({ name: sheetName(s.name, used), rows: s.rows }));
+    const named = sheets.map((s) => ({ name: Values.sheetName(s.name, used), rows: s.rows }));
 
     const files = [
       {

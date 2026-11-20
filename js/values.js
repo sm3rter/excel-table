@@ -72,5 +72,36 @@
     return name;
   }
 
-  return { format, formatDate, parse, compare, columnName };
+  const BUILTIN_DATE_FORMATS = new Set([14, 15, 16, 17, 18, 19, 20, 21, 22, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36,
+    45, 46, 47, 50, 51, 52, 53, 54, 55, 56, 57, 58]);
+
+  /** Does an Excel number format (built-in id, or custom code looked up in customCodes) show a date or time? */
+  function isDateFormat(id, customCodes) {
+    if (BUILTIN_DATE_FORMATS.has(id)) return true;
+    const code = customCodes && customCodes[id];
+    if (!code) return false;
+    const cleaned = code.replace(/"[^"]*"/g, '').replace(/\\./g, '').replace(/\[[^\]]*\]/g, '').replace(/_./g, '');
+    return /[ymdhs]/i.test(cleaned);
+  }
+
+  /** Excel serial number (1900 or 1904 date system) to a UTC Date, rounded to the second. */
+  function serialToDate(serial, date1904) {
+    const days = date1904 ? serial + 1462 : serial;
+    return new Date(Math.round(((days - 25569) * 86400000) / 1000) * 1000);
+  }
+
+  /** A valid, unique Excel sheet name (max 31 characters, none of []:*?/\\). `used` is a Set of lower-cased names. */
+  function sheetName(raw, used) {
+    const base = String(raw || 'Sheet').replace(/[\[\]:*?\/\\]/g, ' ').replace(/^'+|'+$/g, '').trim().slice(0, 31) || 'Sheet';
+    let name = base;
+    let n = 2;
+    while (used.has(name.toLowerCase())) {
+      const suffix = ' (' + n++ + ')';
+      name = base.slice(0, 31 - suffix.length) + suffix;
+    }
+    used.add(name.toLowerCase());
+    return name;
+  }
+
+  return { format, formatDate, parse, compare, columnName, isDateFormat, serialToDate, sheetName };
 });

@@ -194,3 +194,54 @@ test('JSON export uses the first row as keys and de-duplicates them', () => {
   ]);
   assert.deepEqual(JSON.parse(Tabular.toJson([[1, 2]], false)), [[1, 2]]);
 });
+
+// ------------------------------------------------------------------ .xls
+
+const XlsLite = require('../js/xls.js');
+
+test('reads .xls files written by LibreOffice', () => {
+  const book = XlsLite.read(fs.readFileSync(path.join(__dirname, 'fixtures/libreoffice-from-openpyxl.xls')));
+  assert.equal(book.sheets.length, 2);
+  const rows = book.sheets[0].rows;
+  assert.deepEqual(rows[0], ['الماركة', 'الموديل', 'Year', 'Price', 'Available', 'Added', 'Updated']);
+  assert.equal(rows[1][3], 15999.5);
+  assert.equal(rows[1][5].toISOString(), '2024-03-05T00:00:00.000Z');
+  assert.equal(rows[2][1], 'Corolla & Co <x> "q"');
+  assert.equal(book.sheets[1].rows[2][1], 'offset cell');
+});
+
+test('reads the second .xls fixture', () => {
+  const book = XlsLite.read(fs.readFileSync(path.join(__dirname, 'fixtures/libreoffice-from-xlsxwriter.xls')));
+  assert.ok(book.sheets.length >= 1);
+  assert.ok(book.sheets[0].rows.length > 1);
+});
+
+test('.xls write/read round trip, including long text split across SST records', () => {
+  const long = 'سلام '.repeat(4000);
+  const wide = 'x'.repeat(30000);
+  const rows = [
+    ['Name', 'Qty', 'When', 'Ok', 'Note'],
+    ['علي', 1.5, d('2024-03-05T00:00:00Z'), true, 'é'],
+    ['b', -2, d('2024-03-05T13:45:00Z'), false, wide],
+    [null, '', null, null, long],
+  ];
+  for (let i = 0; i < 2000; i++) rows.push(['row' + i, i, null, null, 't' + (i % 7)]);
+  const bytes = XlsLite.write([{ name: 'One', rows }, { name: 'One', rows: [['a'], [1]] }], {});
+  assert.ok(XlsLite.isXls(bytes));
+  const back = XlsLite.read(bytes);
+  assert.deepEqual(back.sheets.map((s) => s.name), ['One', 'One (2)']);
+  const r = back.sheets[0].rows;
+  assert.equal(r.length, rows.length);
+  assert.deepEqual(r[1], rows[1]);
+  assert.equal(r[2][4], wide);
+  assert.equal(r[3][4], long);
+  assert.equal(r[2][2].toISOString(), '2024-03-05T13:45:00.000Z');
+  assert.deepEqual(r[r.length - 1], rows[rows.length - 1]);
+});
+
+test('.xls writer rejects sheets beyond the format limits and readers reject junk', () => {
+  assert.throws(() => XlsLite.write([{ name: 'S', rows: new Array(65537).fill(['a']) }]), /65,536/);
+  assert.throws(() => XlsLite.write([{ name: 'S', rows: [new Array(257).fill('a')] }]), /256/);
+  assert.equal(XlsLite.isXls(new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8])), false);
+  assert.throws(() => XlsLite.read(new Uint8Array([0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1, 0, 0])));
+});
