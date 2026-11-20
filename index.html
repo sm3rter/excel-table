@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#f3f6f1" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0e1511" media="(prefers-color-scheme: dark)">
+  <meta name="description" content="Open, edit and convert xlsx, csv and json files in your browser. Nothing is uploaded.">
+  <title>Excel Table</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231e6b4b'/%3E%3Cpath d='M8 8h16v16H8zM8 13.3h16M8 18.7h16M13.3 8v16M18.7 8v16' fill='none' stroke='%23fff' stroke-width='1.6' opacity='.55'/%3E%3Crect x='13.3' y='13.3' width='5.4' height='5.4' fill='%23fff'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="bar">
+    <svg class="logo" viewBox="0 0 32 32" aria-hidden="true">
+      <rect width="32" height="32" rx="7"/>
+      <path d="M8 8h16v16H8zM8 13.3h16M8 18.7h16M13.3 8v16M18.7 8v16"/>
+      <rect class="mark" x="13.3" y="13.3" width="5.4" height="5.4"/>
+    </svg>
+    <h1 id="title" class="title" data-i18n="app.title">Excel Table</h1>
+    <button id="open-btn" class="btn quiet" type="button" data-i18n="bar.open" hidden>Open file</button>
+    <button id="lang-btn" class="btn quiet lang" type="button" data-i18n-label="bar.language" aria-label="Language">ع</button>
+  </header>
+
+  <main>
+    <section id="welcome" class="welcome">
+      <button id="drop" class="drop" type="button">
+        <span class="drop-col" aria-hidden="true">A</span>
+        <span class="drop-row" aria-hidden="true">1</span>
+        <span class="drop-cell">
+          <span class="drop-title" data-i18n="welcome.title">Open a spreadsheet</span>
+          <span class="drop-action" data-i18n="welcome.choose">Choose a file</span>
+        </span>
+      </button>
+      <p class="lead" data-i18n="welcome.lead">View, edit and convert xlsx, csv and json files. Nothing is uploaded: your file stays on this device.</p>
+      <div class="welcome-actions">
+        <button id="sample-btn" class="btn" type="button" data-i18n="welcome.sample">Try the sample</button>
+      </div>
+      <p class="fine hint-drop" data-i18n="welcome.drop">You can also drop a file anywhere on this page.</p>
+      <p class="fine" data-i18n="welcome.formats">Supported: xlsx, csv, tsv and json. For an old .xls file, open it in Excel and save it as .xlsx first.</p>
+    </section>
+
+    <section id="workspace" class="workspace" hidden>
+      <div class="formula">
+        <output id="cell-ref" class="cell-ref" dir="ltr">A1</output>
+        <input id="cell-input" class="cell-input" type="text" dir="auto" autocomplete="off" autocapitalize="off" spellcheck="false" disabled
+               data-i18n-placeholder="formula.placeholder" data-i18n-label="formula.label" placeholder="Tap a cell to edit it">
+      </div>
+
+      <div class="tools">
+        <input id="search" class="search" type="search" dir="auto" autocomplete="off" data-i18n-placeholder="search.placeholder" data-i18n-label="search.placeholder" placeholder="Search rows">
+        <button id="export-btn" class="btn primary export" type="button" data-i18n="export">Export</button>
+        <label class="check"><input id="header-toggle" type="checkbox" checked> <span data-i18n="header.toggle">First row is header</span></label>
+        <button id="add-row" class="btn add" type="button" data-i18n="row.add">Add row</button>
+      </div>
+
+      <nav id="tabs" class="tabs" hidden></nav>
+
+      <div id="grid-wrap" class="grid-wrap">
+        <table id="grid" class="grid" role="grid"></table>
+      </div>
+
+      <footer class="pager">
+        <button id="prev" class="btn quiet icon" type="button" data-i18n-label="pager.prev" aria-label="Previous page">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12.5 4.5 7 10l5.5 5.5"/></svg>
+        </button>
+        <span id="pager-info" class="pager-info" role="status"></span>
+        <button id="next" class="btn quiet icon" type="button" data-i18n-label="pager.next" aria-label="Next page">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7.5 4.5 13 10l-5.5 5.5"/></svg>
+        </button>
+      </footer>
+    </section>
+  </main>
+
+  <dialog id="sheet" class="sheet">
+    <div class="sheet-head">
+      <h2 id="sheet-title" class="sheet-title"></h2>
+      <button id="sheet-close" class="btn quiet icon" type="button" data-i18n-label="dialog.close" aria-label="Close">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5 5 15"/></svg>
+      </button>
+    </div>
+    <div id="sheet-items" class="sheet-items"></div>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden>
+    <span id="toast-text"></span>
+    <button id="toast-action" class="toast-action" type="button" hidden></button>
+  </div>
+  <div class="drop-overlay" aria-hidden="true"><span data-i18n="drop.overlay">Drop to open</span></div>
+  <div id="busy" class="busy" role="status" hidden><span data-i18n="busy">Opening…</span></div>
+
+  <input id="file-input" type="file" hidden
+         accept=".xlsx,.xlsm,.csv,.tsv,.txt,.json,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,application/json">
+
+  <script src="js/zip.js"></script>
+  <script src="js/values.js"></script>
+  <script src="js/xlsx.js"></script>
+  <script src="js/tabular.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="data/sample.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

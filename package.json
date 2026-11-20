@@ -1,0 +1,11 @@
+{
+  "name": "excel-table",
+  "version": "1.0.0",
+  "description": "Open, edit and convert spreadsheets (xlsx, csv, json) in the browser. No server, no dependencies.",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "test": "node --test",
+    "start": "node scripts/serve.js"
+  }
+}

@@ -1,0 +1,514 @@
+/*
+ * Excel Table: mobile-first styles.
+ * Base rules are for a phone; wider screens are handled in the @media blocks at the end.
+ * Logical properties (inline-start/end) keep the layout correct in both LTR and RTL.
+ */
+
+:root {
+  --paper: #f3f6f1;
+  --card: #ffffff;
+  --ink: #14201a;
+  --muted: #5b6b61;
+  --line: #d3ddd5;
+  --grid: #e3eae4;
+  --head: #e8efe9;
+  --accent: #1e6b4b;
+  --accent-ink: #ffffff;
+  --accent-soft: #dcebe2;
+  --danger: #b3321f;
+  --shadow: 0 1px 2px rgba(20, 32, 26, .08), 0 8px 24px rgba(20, 32, 26, .10);
+
+  --bar-h: 52px;
+  --letters-h: 34px;
+  --row-h: 44px;
+  --rowno-w: 52px;
+  --gutter: 16px;
+  --radius: 10px;
+  --font: system-ui, -apple-system, "Segoe UI", Tahoma, "Noto Sans Arabic", "Noto Sans", sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #0e1511;
+    --card: #151d18;
+    --ink: #e6efe8;
+    --muted: #93a59a;
+    --line: #2a372f;
+    --grid: #1f2a23;
+    --head: #1b2620;
+    --accent: #5bc18f;
+    --accent-ink: #08140d;
+    --accent-soft: #1f3a2d;
+    --danger: #ff8d79;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .45);
+  }
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  color: var(--ink);
+  font: 16px/1.5 var(--font);
+}
+
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ----------------------------------------------------------------- app bar */
+
+.bar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: calc(var(--bar-h) + env(safe-area-inset-top));
+  padding: env(safe-area-inset-top) max(var(--gutter), env(safe-area-inset-right)) 0 max(var(--gutter), env(safe-area-inset-left));
+  background: var(--paper);
+  border-block-end: 1px solid var(--line);
+}
+
+.logo { width: 28px; height: 28px; flex: none; }
+.logo rect:first-child { fill: var(--accent); }
+.logo path { fill: none; stroke: var(--accent-ink); stroke-width: 1.6; opacity: .55; }
+.logo .mark { fill: var(--accent-ink); }
+
+.title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 650;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ----------------------------------------------------------------- buttons */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--card);
+  font-weight: 560;
+  white-space: nowrap;
+}
+.btn:active { transform: translateY(1px); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.quiet { background: transparent; border-color: transparent; }
+.btn.lang { min-width: 44px; padding: 0 10px; font-size: 1.05rem; }
+.btn.icon { width: 44px; padding: 0; }
+.btn.icon svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.btn:disabled { opacity: .4; cursor: default; }
+
+/* ----------------------------------------------------------------- welcome */
+
+main { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+
+.welcome {
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 24px var(--gutter) calc(32px + env(safe-area-inset-bottom));
+}
+
+/* The drop target looks like one selected cell of an empty sheet. */
+.drop {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 28px 0 0 28px;
+  border: 0;
+  border-radius: var(--radius);
+  background:
+    linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 100% 44px,
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0 / 88px 100%,
+    var(--card);
+  text-align: start;
+  box-shadow: 0 0 0 1px var(--line);
+  overflow: hidden;
+}
+/* the empty corner where the column letters meet the row numbers */
+.drop::before {
+  content: "";
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  width: 28px;
+  height: 28px;
+  background: var(--head);
+  border-inline-end: 1px solid var(--line);
+  border-block-end: 1px solid var(--line);
+}
+.drop-col, .drop-row {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  background: var(--head);
+  color: var(--muted);
+  font-size: .75rem;
+  font-weight: 600;
+}
+.drop-col { inset-block-start: 0; inset-inline: 28px 0; height: 28px; border-block-end: 1px solid var(--line); }
+.drop-row { inset-block: 28px 0; inset-inline-start: 0; width: 28px; border-inline-end: 1px solid var(--line); align-content: start; padding-top: 12px; }
+.drop-col { justify-content: start; padding-inline-start: 12px; }
+
+.drop-cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 176px;
+  margin: 0;
+  padding: 24px 20px;
+  justify-content: center;
+  border: 2px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 6%, var(--card));
+}
+/* the fill handle in the corner of a selected cell */
+.drop-cell::after {
+  content: "";
+  position: absolute;
+  inset-block-end: -5px;
+  inset-inline-end: -5px;
+  width: 9px;
+  height: 9px;
+  background: var(--accent);
+  border: 2px solid var(--card);
+}
+.drop-title { font-size: 1.5rem; font-weight: 700; line-height: 1.25; }
+.drop-action { color: var(--accent); font-weight: 650; }
+.drop-action::after { content: ""; }
+.drop:hover .drop-action { text-decoration: underline; text-underline-offset: 3px; }
+
+.lead { margin: 20px 0 16px; color: var(--ink); max-width: 56ch; }
+.welcome-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.fine { margin: 16px 0 0; color: var(--muted); font-size: .875rem; max-width: 60ch; }
+.hint-drop { display: none; }
+
+/* --------------------------------------------------------------- workspace */
+
+.workspace {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  height: calc(100dvh - var(--bar-h) - env(safe-area-inset-top));
+}
+
+.formula {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  margin: 10px var(--gutter) 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--card);
+  overflow: hidden;
+}
+.formula:focus-within { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.cell-ref {
+  display: grid;
+  place-items: center;
+  min-width: 56px;
+  padding: 0 10px;
+  background: var(--head);
+  border-inline-end: 1px solid var(--line);
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+.cell-input {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  background: transparent;
+  font-size: 16px; /* 16px or more stops iOS from zooming the page on focus */
+}
+.cell-input:focus-visible { outline: none; }
+.cell-input:disabled { color: var(--muted); }
+
+.tools {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: "search export" "check add";
+  gap: 8px;
+  margin: 10px var(--gutter) 0;
+  align-items: center;
+}
+.search {
+  grid-area: search;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--card);
+}
+.export { grid-area: export; }
+.add { grid-area: add; min-height: 40px; }
+.check { grid-area: check; display: flex; align-items: center; gap: 8px; min-height: 40px; color: var(--muted); font-size: .9375rem; }
+.check input { width: 20px; height: 20px; accent-color: var(--accent); margin: 0; }
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin: 10px var(--gutter) 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  flex: none;
+  max-width: 14rem;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px 8px 0 0;
+  background: var(--head);
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tab[aria-current="true"] { background: var(--card); color: var(--ink); font-weight: 650; border-block-end-color: var(--card); }
+
+.grid-wrap {
+  flex: 1;
+  min-height: 0;
+  margin: 10px 0 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  background: var(--card);
+  border-block: 1px solid var(--line);
+  scroll-padding-block-start: calc(var(--letters-h) + var(--row-h));
+  scroll-padding-inline-start: var(--rowno-w);
+  -webkit-overflow-scrolling: touch;
+}
+
+.grid {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: .9375rem;
+}
+.grid th, .grid td {
+  height: var(--row-h);
+  padding: 0 12px;
+  border-inline-end: 1px solid var(--grid);
+  border-block-end: 1px solid var(--grid);
+  min-width: 7.5rem;
+  max-width: 20rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: start;
+}
+.grid td { background: var(--card); cursor: cell; }
+.grid td.num { text-align: end; font-variant-numeric: tabular-nums; }
+
+/* column letters and row numbers, like a real spreadsheet */
+.grid thead th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  height: var(--letters-h);
+  padding: 0;
+  background: var(--head);
+  color: var(--muted);
+  font-size: .8125rem;
+  font-weight: 600;
+  text-align: center;
+}
+.grid thead th.corner { inset-inline-start: 0; z-index: 5; min-width: var(--rowno-w); max-width: var(--rowno-w); }
+.grid .rowno {
+  position: sticky;
+  inset-inline-start: 0;
+  z-index: 2;
+  min-width: var(--rowno-w);
+  max-width: var(--rowno-w);
+  padding: 0;
+  background: var(--head);
+  color: var(--muted);
+  font-size: .8125rem;
+  font-weight: 600;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.grid thead .hdr .rowno { top: var(--letters-h); z-index: 4; }
+.hbtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+.hbtn:focus-visible { outline-offset: -3px; }
+.sort { color: var(--accent); }
+
+/* header row of the data (the first row of the sheet) */
+.grid .hdr td {
+  position: sticky;
+  top: var(--letters-h);
+  z-index: 1;
+  background: var(--card);
+  font-weight: 700;
+  border-block-end: 2px solid var(--line);
+}
+
+/* selection: the cell, plus its column letter and row number */
+.grid td.sel { box-shadow: inset 0 0 0 2px var(--accent); background: color-mix(in srgb, var(--accent) 8%, var(--card)); }
+.grid th.active, .grid th.active .hbtn { background: var(--accent-soft); color: var(--accent); }
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px max(8px, env(safe-area-inset-right)) calc(4px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+  color: var(--muted);
+  font-size: .9375rem;
+  font-variant-numeric: tabular-nums;
+}
+.pager-info { text-align: center; }
+[dir="rtl"] .pager .icon svg { transform: scaleX(-1); }
+
+/* ------------------------------------------------- bottom sheet (dialog) */
+
+.sheet {
+  width: 100%;
+  max-width: none;
+  margin: auto 0 0;
+  padding: 0 0 env(safe-area-inset-bottom);
+  border: 0;
+  border-radius: 16px 16px 0 0;
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+}
+.sheet::backdrop { background: rgba(8, 16, 11, .5); }
+.sheet[open] { animation: sheet-in .18s ease-out; }
+@keyframes sheet-in { from { transform: translateY(24px); opacity: 0; } }
+.sheet-head { display: flex; align-items: center; justify-content: space-between; padding: 6px 8px 0 20px; }
+.sheet-title { margin: 0; font-size: 1.0625rem; font-weight: 650; }
+.sheet-items { display: flex; flex-direction: column; padding: 4px 8px 12px; }
+.sheet-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-height: 52px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  text-align: start;
+}
+.sheet-item:active, .sheet-item:hover { background: var(--head); }
+.sheet-item .t { font-weight: 600; }
+.sheet-item .h { color: var(--muted); font-size: .875rem; }
+.sheet-item.danger .t { color: var(--danger); }
+.sheet-item:disabled { opacity: .4; }
+
+/* --------------------------------------------------------- toast and busy */
+
+.toast {
+  position: fixed;
+  inset-inline: var(--gutter);
+  inset-block-end: calc(16px + env(safe-area-inset-bottom));
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  max-width: 480px;
+  margin-inline: auto;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: var(--shadow);
+}
+.toast.error { background: var(--danger); color: #fff; }
+.toast-action { padding: 6px 4px; border: 0; background: transparent; color: inherit; font-weight: 700; text-decoration: underline; min-height: 36px; }
+
+.busy { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; background: rgba(8, 16, 11, .35); color: #fff; font-weight: 650; }
+
+.drop-overlay {
+  position: fixed;
+  inset: 12px;
+  z-index: 60;
+  display: none;
+  place-items: center;
+  border: 3px dashed var(--accent);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  color: var(--accent);
+  font-size: 1.25rem;
+  font-weight: 700;
+  pointer-events: none;
+}
+body.dragging .drop-overlay { display: grid; }
+
+/* ---------------------------------------------------- larger screens */
+
+@media (min-width: 640px) {
+  :root { --gutter: 24px; }
+
+  .tools {
+    grid-template-columns: minmax(0, 1fr) auto auto auto;
+    grid-template-areas: "search check add export";
+    gap: 12px;
+  }
+
+  .sheet {
+    width: min(440px, calc(100vw - 32px));
+    margin: auto;
+    border-radius: 14px;
+  }
+  .hint-drop { display: block; }
+}
+
+/* a mouse is more precise than a finger: use denser rows */
+@media (pointer: fine) {
+  :root { --row-h: 34px; --letters-h: 30px; }
+  .btn { min-height: 38px; }
+  .search, .cell-input { min-height: 38px; }
+  .grid { font-size: .875rem; }
+}
+
+@media (min-width: 960px) {
+  .welcome { padding-top: 56px; }
+  .workspace { max-width: 1400px; width: 100%; margin: 0 auto; }
+  .grid-wrap { margin-inline: var(--gutter); border-inline: 1px solid var(--line); border-radius: 0 0 var(--radius) var(--radius); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet[open] { animation: none; }
+  .btn:active { transform: none; }
+}
