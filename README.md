@@ -18,6 +18,7 @@ No server, no build step, no dependencies, and nothing is uploaded: your file ne
 - **Mobile first.** Big touch targets, a bottom sheet for menus and sticky headers.
 - **English and Arabic**, with a right-to-left layout. Arabic CSV files saved by Excel (windows-1256) open correctly, and an exported `.xlsx` is set to right-to-left automatically when its content is Arabic.
 - **Light and dark** theme, following the device setting.
+- **Private by design.** A strict Content Security Policy (no inline scripts or styles, no network requests, no third-party code) is set in `index.html`, so the page cannot send your data anywhere.
 
 ## Use it
 

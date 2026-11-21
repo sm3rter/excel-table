@@ -4,14 +4,22 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="#f3f6f1" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#0e1511" media="(prefers-color-scheme: dark)">
-  <meta name="description" content="Open, edit and convert xlsx, xls, csv and json files in your browser. Nothing is uploaded.">
-  <title>Excel Table</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231e6b4b'/%3E%3Cpath d='M8 8h16v16H8zM8 13.3h16M8 18.7h16M13.3 8v16M18.7 8v16' fill='none' stroke='%23fff' stroke-width='1.6' opacity='.55'/%3E%3Crect x='13.3' y='13.3' width='5.4' height='5.4' fill='%23fff'/%3E%3C/svg%3E">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <meta name="theme-color" content="#e8edf2" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#08121a" media="(prefers-color-scheme: dark)">
+  <title>Excel Table: open, edit and convert xlsx, xls and csv online</title>
+  <meta name="description" content="Free spreadsheet viewer and converter that runs in your browser. Open and edit xlsx, xls, csv, tsv and json files, then export. Nothing is uploaded. Works on phones, English and Arabic.">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Excel Table: open, edit and convert xlsx, xls and csv">
+  <meta property="og:description" content="Open and edit spreadsheets in your browser. Nothing is uploaded, nothing to install.">
+  <meta name="twitter:card" content="summary">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2315304a'/%3E%3Cpath d='M8 8h16v16H8zM8 13.3h16M8 18.7h16M13.3 8v16M18.7 8v16' fill='none' stroke='%23cfe0ee' stroke-width='1.4' opacity='.6'/%3E%3Crect x='13.3' y='13.3' width='5.4' height='5.4' fill='%23ffd84a'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+  <noscript><p>Excel Table needs JavaScript to open spreadsheets in your browser. Nothing is uploaded.</p></noscript>
   <header class="bar">
     <svg class="logo" viewBox="0 0 32 32" aria-hidden="true">
       <rect width="32" height="32" rx="7"/>
@@ -38,7 +46,9 @@
         <button id="sample-btn" class="btn" type="button" data-i18n="welcome.sample">Try the sample</button>
       </div>
       <p class="fine hint-drop" data-i18n="welcome.drop">You can also drop a file anywhere on this page.</p>
-      <p class="fine" data-i18n="welcome.formats">Supported: xlsx, xls, csv, tsv and json.</p>
+      <ul class="formats" data-i18n-label="welcome.formats" aria-label="Supported: xlsx, xls, csv, tsv and json.">
+        <li>.xlsx</li><li>.xls</li><li>.csv</li><li>.tsv</li><li>.json</li>
+      </ul>
     </section>
 
     <section id="workspace" class="workspace" hidden>

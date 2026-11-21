@@ -294,7 +294,8 @@
     items.forEach((item) => {
       const b = document.createElement('button');
       b.type = 'button';
-      b.className = 'sheet-item' + (item.danger ? ' danger' : '');
+      b.className = 'sheet-item' + (item.danger ? ' danger' : '') + (item.current ? ' current' : '');
+      if (item.current) b.setAttribute('aria-current', 'true');
       const label = document.createElement('span');
       label.className = 't';
       label.textContent = item.label;
@@ -630,8 +631,8 @@
 
   els.langBtn.addEventListener('click', () => {
     openMenu(t('lang.title'), [
-      { label: 'English', hint: I18n.lang === 'en' ? '✓' : '', run: () => setLanguage('en') },
-      { label: 'العربية', hint: I18n.lang === 'ar' ? '✓' : '', run: () => setLanguage('ar') },
+      { label: 'English', current: I18n.lang === 'en', run: () => setLanguage('en') },
+      { label: 'العربية', current: I18n.lang === 'ar', run: () => setLanguage('ar') },
     ]);
   });
 
